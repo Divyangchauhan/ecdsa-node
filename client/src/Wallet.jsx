@@ -1,9 +1,26 @@
 import server from "./server";
+// import { secp256k1 } from "@noble/curves/secp256k1";
+import { secp256k1 } from "ethereum-cryptography/secp256k1";
+import { toHex } from "ethereum-cryptography/utils";
 
-function Wallet({ address, setAddress, balance, setBalance }) {
+function Wallet({
+  privateKey,
+  setPrivateKey,
+  address,
+  setAddress,
+  balance,
+  setBalance,
+}) {
   async function onChange(evt) {
-    const address = evt.target.value;
-    setAddress(address);
+    setPrivateKey(evt.target.value);
+    try {
+      const address = toHex(secp256k1.getPublicKey(evt.target.value));
+      //  evt.target.value;
+      // setPrivateKey(evt.target.value);
+      setAddress(address);
+    } catch (err) {
+      console.log(err);
+    }
     if (address) {
       const {
         data: { balance },
@@ -19,8 +36,21 @@ function Wallet({ address, setAddress, balance, setBalance }) {
       <h1>Your Wallet</h1>
 
       <label>
-        Wallet Address
-        <input placeholder="Type an address, for example: 0x1" value={address} onChange={onChange}></input>
+        Wallet Private Key
+        <input
+          placeholder="Type an address, for example: 0x1"
+          value={privateKey}
+          onChange={onChange}
+        ></input>
+      </label>
+
+      <label>
+        Wallet Public Address
+        <input
+          placeholder="Please Enter private key"
+          value={address}
+          readOnly
+        ></input>
       </label>
 
       <div className="balance">Balance: {balance}</div>
