@@ -3,11 +3,12 @@ import server from "./server";
 import { secp256k1 } from "ethereum-cryptography/secp256k1";
 import { toHex, utf8ToBytes } from "ethereum-cryptography/utils";
 import { sha256 } from "ethereum-cryptography/sha256";
-// import { ecdsaSign } from "ethereum-cryptography/secp256k1-compat";
-// const secp = require("ethereum-cryptography/secp256k1");
-// const { keccak256 } = require("ethereum-cryptography/keccak");
 
-function Transfer({ address, setBalance, privateKey }) {
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
+function Transfer({ balance, setBalance, address, privateKey }) {
   const [sendAmount, setSendAmount] = useState("");
   const [recipient, setRecipient] = useState("");
 
@@ -16,41 +17,26 @@ function Transfer({ address, setBalance, privateKey }) {
   async function transfer(evt) {
     evt.preventDefault();
 
-    // sign the transaction
     const data = {
       sender: address,
       amount: parseInt(sendAmount),
       recipient: recipient,
     };
 
-    const msgHash = keccak256(
-      utf8ToBytes(recipient + sendAmount + JSON.stringify(nonce))
-    );
-    const signTxn = await secp.sign(msgHash, privateKey, { recovered: true });
-
-    console.log(JSON.stringify(data));
-
+    // sign the transaction
     const hash = sha256(utf8ToBytes(JSON.stringify(data)));
     console.log(toHex(hash));
     const signature = secp256k1.sign(hash, privateKey);
-
-    const jsonsignature = JSON.stringify({
-      r: String(signature.r),
-      s: String(signature.s),
-    });
-
-    console.log(signature);
-
-    console.log(jsonsignature);
 
     try {
       const { data } = await server.post(`send`, {
         sender: address,
         amount: parseInt(sendAmount),
         recipient: recipient,
-        signature: jsonsignature,
+        signature: signature,
       });
       console.log(data["balance"]);
+      setBalance(data["balance"]);
       console.log("calling api");
     } catch (ex) {
       console.log(ex);

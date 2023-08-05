@@ -19,6 +19,7 @@ function App() {
         setPrivateKey={setPrivateKey}
       />
       <Transfer
+        balance={balance}
         setBalance={setBalance}
         address={address}
         privateKey={privateKey}

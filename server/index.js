@@ -32,7 +32,7 @@ app.post("/send", (req, res) => {
   const { sender, recipient, amount, signature } = req.body;
 
   const verification = secp256k1.secp256k1.verify(
-    JSON.parse(signature),
+    { r: BigInt(signature.r), s: BigInt(signature.s) },
     sha256(
       utf8ToBytes(
         JSON.stringify({
@@ -46,10 +46,10 @@ app.post("/send", (req, res) => {
   );
 
   console.log(verification);
-
-  setInitialBalance(sender);
-  setInitialBalance(recipient);
-
+  if (verification) {
+    setInitialBalance(sender);
+    setInitialBalance(recipient);
+  }
   if (
     balances2.find((wallet) => wallet.publicKey === sender).balance < amount
   ) {
