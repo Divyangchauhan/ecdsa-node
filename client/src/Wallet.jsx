@@ -12,13 +12,14 @@ function Wallet({
   setBalance,
 }) {
   async function onChange(evt) {
-    setPrivateKey(evt.target.value);
     try {
-      const address = toHex(secp256k1.getPublicKey(evt.target.value));
+      setPrivateKey(evt.target.value);
+      var address = toHex(secp256k1.getPublicKey(evt.target.value));
       //  evt.target.value;
       // setPrivateKey(evt.target.value);
       setAddress(address);
     } catch (err) {
+      setAddress("");
       console.log(err);
     }
     if (address) {
