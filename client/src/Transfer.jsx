@@ -17,6 +17,15 @@ function Transfer({ balance, setBalance, address, privateKey }) {
   async function transfer(evt) {
     evt.preventDefault();
 
+    if (!address) {
+      alert("Please set your private key");
+      return;
+    }
+
+    if (address === recipient) {
+      alert("You cannot send to yourself");
+      return;
+    }
     const data = {
       sender: address,
       amount: parseInt(sendAmount),
@@ -46,7 +55,6 @@ function Transfer({ balance, setBalance, address, privateKey }) {
   return (
     <form className="container transfer" onSubmit={transfer}>
       <h1>Send Transaction</h1>
-      <h2>{privateKey}</h2>
 
       <label>
         Send Amount
